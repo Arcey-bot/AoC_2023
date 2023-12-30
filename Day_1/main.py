@@ -3,23 +3,16 @@ def parse_input(f):
         lines = f.readlines()
     return lines
 
-def find_numeric(line):
+def build_int(line):
+    return int(f'{find(line)}{find(line[::-1])}')
+
+def find(line):
     for c in line:
-        if c.isdigit():
-            return c
-        
-def rfind_numeric(line):
-    for c in line[::-1]:
         if c.isdigit():
             return c
 
 def main(lines):
-    nums = []
-    for l in lines:
-        s = find_numeric(l)
-        s += rfind_numeric(l)
-        nums.append(int(s))
-    return sum(nums)
+    return sum([build_int(l) for l in lines])
         
 if __name__ == '__main__':
     lines = parse_input('input2.txt')
