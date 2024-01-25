@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const FILE string = "input1.txt"
+const FILE string = "input.txt"
 const SKIP string = "."
 
 type Schematic struct {
@@ -42,8 +42,25 @@ func (s *Schematic) part_value(r, c int) int {
 		return 0 // err
 	}
 
-	base := 10
+	base := 1 // to build from back to front, the base must begin at 1 and grow by 10 per digit
 	n := 0
+
+	// go from c-1 to beginning
+	for i := c - 1; i >= 0; i-- {
+		numeric, num = is_digit(s.scheme[r][i])
+
+		if numeric {
+			// fmt.Printf("[B] Number: (%v * %v) + %v = %v\n", *num, base, n, (*num*base)+n)
+			s.scheme[r][i] = SKIP // consume
+			n += *num * base      // insert number at beginning
+			base *= 10
+		} else {
+			break // no more numbers
+		}
+	}
+
+	// fmt.Printf("Build now at %v\n", n)
+	base = 10
 
 	// go from c to end of array
 	for i := c; i < len(s.scheme[r]); i++ {
@@ -51,26 +68,9 @@ func (s *Schematic) part_value(r, c int) int {
 		// fmt.Printf("Received Digit: %v - %v\n", numeric, *num)
 
 		if numeric {
-			fmt.Printf("[F] Number: (%v * %v) + %v = %v\n", n, base, *num, (n*base)+*num)
+			// fmt.Printf("[F] Number: (%v * %v) + %v = %v\n", n, base, *num, (n*base)+*num)
 			s.scheme[r][i] = SKIP // consume
 			n = (n * base) + *num // mult by 10 + new val is equivalent to appending a number
-		} else {
-			break // no more numbers
-		}
-	}
-
-	fmt.Printf("Build now at %v\n", n)
-	base = 1 // to build from back to front, the base must begin at 1 and grow by 10 per digit
-
-	// go from c-1 to beginning
-	for i := c - 1; i >= 0; i-- {
-		numeric, num = is_digit(s.scheme[r][i])
-
-		if numeric {
-			fmt.Printf("[B] Number: (%v * %v) + %v = %v\n", *num, base, n, (*num*base)+n)
-			s.scheme[r][i] = SKIP // consume
-			n += *num * base      // insert number at beginning
-			base *= 10
 		} else {
 			break // no more numbers
 		}
@@ -84,42 +84,42 @@ func (s *Schematic) parse_perimeter(r, c int) (sum int) {
 	// TL
 	if s.inbounds(r-1, c-1) {
 		sum += s.part_value(r-1, c-1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r-1, c-1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c-1, sum)
 	}
 	// Middle
 	if s.inbounds(r-1, c) {
 		sum += s.part_value(r-1, c)
-		fmt.Printf("Value @ (%v, %v) %v\n", r-1, c, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c, sum)
 	}
 	// TR
 	if s.inbounds(r-1, c+1) {
 		sum += s.part_value(r-1, c+1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r-1, c+1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c+1, sum)
 	}
 	// L
 	if s.inbounds(r, c-1) {
 		sum += s.part_value(r, c-1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r, c-1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r, c-1, sum)
 	}
 	// R
 	if s.inbounds(r, c+1) {
 		sum += s.part_value(r, c+1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r, c+1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r, c+1, sum)
 	}
 	// BL
 	if s.inbounds(r+1, c-1) {
 		sum += s.part_value(r+1, c-1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r+1, c-1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c-1, sum)
 	}
 	// BM
 	if s.inbounds(r+1, c) {
 		sum += s.part_value(r+1, c)
-		fmt.Printf("Value @ (%v, %v) %v\n", r+1, c, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c, sum)
 	}
 	// BR
 	if s.inbounds(r+1, c+1) {
 		sum += s.part_value(r+1, c+1)
-		fmt.Printf("Value @ (%v, %v) %v\n", r+1, c+1, sum)
+		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c+1, sum)
 	}
 	return sum
 }
@@ -135,7 +135,7 @@ func (s *Schematic) solve() (sum int) {
 			if s.part_square(i, j) {
 				// fmt.Printf("%v @ (%v,÷ %v) is a potential part number\n", c, i, j)
 				sum += s.parse_perimeter(i, j)
-				fmt.Printf("Sum total: %v\n", sum)
+				// fmt.Printf("Sum total: %v\n", sum)
 			}
 		}
 	}
@@ -148,7 +148,7 @@ func main() {
 
 	fmt.Println(&scheme)
 	fmt.Println(scheme.solve())
-	fmt.Println(&scheme)
+	// fmt.Println(&scheme)
 }
 
 func is_digit(s string) (bool, *int) {
