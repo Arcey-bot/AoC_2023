@@ -10,6 +10,7 @@ import (
 
 const FILE string = "input.txt"
 const SKIP string = "."
+const GEAR string = "*"
 
 type Schematic struct {
 	scheme [][]string
@@ -79,49 +80,97 @@ func (s *Schematic) part_value(r, c int) int {
 	return n
 }
 
+func (s *Schematic) is_gear(r, c int) bool {
+	return s.scheme[r][c] == GEAR
+}
+
 // parse and sum any numbers in perimeter
 func (s *Schematic) parse_perimeter(r, c int) (sum int) {
+	if !s.is_gear(r, c) {
+		return 0 // not a gear we dont care
+	}
+
+	// not sure if more than 2 numbers can be in the perimeter
+	parts := make([]int, 0, 8)
+	res := 0
+
 	// TL
 	if s.inbounds(r-1, c-1) {
-		sum += s.part_value(r-1, c-1)
+		res = s.part_value(r-1, c-1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
 		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c-1, sum)
 	}
 	// Middle
 	if s.inbounds(r-1, c) {
-		sum += s.part_value(r-1, c)
+		res = s.part_value(r-1, c)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r-1, c)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c, sum)
 	}
 	// TR
 	if s.inbounds(r-1, c+1) {
-		sum += s.part_value(r-1, c+1)
+		res = s.part_value(r-1, c+1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r-1, c+1)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r-1, c+1, sum)
 	}
 	// L
 	if s.inbounds(r, c-1) {
-		sum += s.part_value(r, c-1)
+		res = s.part_value(r, c-1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r, c-1)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r, c-1, sum)
 	}
 	// R
 	if s.inbounds(r, c+1) {
-		sum += s.part_value(r, c+1)
+		res = s.part_value(r, c+1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r, c+1)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r, c+1, sum)
 	}
 	// BL
 	if s.inbounds(r+1, c-1) {
-		sum += s.part_value(r+1, c-1)
+		res = s.part_value(r+1, c-1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r+1, c-1)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c-1, sum)
 	}
 	// BM
 	if s.inbounds(r+1, c) {
-		sum += s.part_value(r+1, c)
+		res = s.part_value(r+1, c)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r+1, c)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c, sum)
 	}
 	// BR
 	if s.inbounds(r+1, c+1) {
-		sum += s.part_value(r+1, c+1)
+		res = s.part_value(r+1, c+1)
+		if res > 0 {
+			parts = append(parts, res)
+		}
+		// parts[i] = s.part_value(r+1, c+1)
 		// fmt.Printf("Value @ (%v, %v) %v\n", r+1, c+1, sum)
 	}
-	return sum
+
+	if len(parts) >= 2 {
+		return gear_ratios(parts)
+	}
+	return 0 // no ratio
+
 }
 
 func (s *Schematic) inbounds(r, c int) bool {
@@ -149,6 +198,14 @@ func main() {
 	fmt.Println(&scheme)
 	fmt.Println(scheme.solve())
 	// fmt.Println(&scheme)
+}
+
+func gear_ratios(nums []int) (s int) {
+	s = 1
+	for _, n := range nums {
+		s *= n
+	}
+	return
 }
 
 func is_digit(s string) (bool, *int) {
