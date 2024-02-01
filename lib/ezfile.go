@@ -1,4 +1,4 @@
-package github.com/Arcey-bot/AoC_2023/lib/ezfile
+package lib/ezfile
 
 import (
 	"bufio"
