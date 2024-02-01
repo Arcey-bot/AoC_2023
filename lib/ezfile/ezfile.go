@@ -1,4 +1,4 @@
-package lib/ezfile
+package ezfile
 
 import (
 	"bufio"
