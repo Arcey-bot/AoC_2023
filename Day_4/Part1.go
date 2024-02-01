@@ -13,6 +13,7 @@ func main() {
 	fmt.Println(data)
 }
 
+// index + 1 is card number
 func load_data(f string) (lines [][]string) {
 	file, err := os.Open(f)
 
@@ -25,9 +26,10 @@ func load_data(f string) (lines [][]string) {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
+	// Get s[1] of split on colon since we don't care for card number
 	for scanner.Scan() {
-		lines = append(lines, strings.Split(scanner.Text(), ""))
+		lines = append(lines, strings.Split(strings.Split(scanner.Text(), ":")[1], "|"))
 	}
 
-	return
+	return lines
 }
