@@ -10,8 +10,8 @@ import (
 )
 
 type Card struct {
-	id int
-	winners, selection []int
+	id, mc, value int
+	matches map[int]int
 }
 
 const FILE string = "input.txt"
@@ -20,35 +20,52 @@ func main() {
 	for _, v := range data {
 		fmt.Println(v)
 	}
+	fmt.Println(sum_cards(data))
 }
 
-func card_value(card Card) (val int) {
-
-
-	// value is defined as: 2^0 = 1, 2^1 = 2, 2^2= 4, ...
-	return int(math.Pow(2, float64(val)))
+func sum_cards(in []Card) (s int) {
+	for _, c := range in {
+		s += c.value
+	}
+	return 
 }
 
 func to_cards(in [][]string) []Card {
 	out := make([]Card, len(in))
 
 	for i, r := range in {
-		c := Card{
-			i+1,
-			to_ints(strings.Split(strings.Trim(r[0], " "), " ")),
-			to_ints(strings.Split(strings.Trim(r[1], " "), " ")),
+		winners, selected := strings.Fields(strings.Trim(r[0], " ")), strings.Fields(strings.Trim(r[1], " "))
+		win := make(map[int]int, len(winners))
+		matches := 0
+		// fmt.Printf("Converting W-%q, S-%q, W-%v\n",winners, selected, win )
+		
+		for _, w := range winners { // save numbers we're looking for
+			n, _ := strconv.Atoi(w)
+			win[n] = 0
 		}
-		out = append(out, c)
-	}
 
-	return out
-}
+		for _, v := range selected { // save selected values and number that won
+			n, _ := strconv.Atoi(v)
+			_, exists := win[n]
+			if exists {
+				matches++
+				win[n]++
+			}
+		}
 
-func to_ints(in []string) []int {
-	out := make([]int, len(in))
+		card_value := 0
+		if matches >= 0 { // value is only nonzero when there are matches
+			// 2^m defines card value, 2^0 is the value of 1 number matching, 2^1 is 2 matches, etc.
+			card_value = int(math.Pow(2, float64(matches-1)))
+		}
 
-	for i, n := range in {
-		out[i], _ = strconv.Atoi(n)
+		// fmt.Printf("Converted M-%v, W-%v\n", matches, win)
+		out[i] = Card{
+			id: i+1,
+			mc: matches,
+			value: card_value,
+			matches: win,
+		}
 	}
 
 	return out
